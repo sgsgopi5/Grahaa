@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Graha – Vedic Kundli Reports</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Source+Serif+4:wght@400;600&display=swap">
+<style>
+:root{--bg:#F5F3FB;--sf:#fff;--tx:#1F1B3D;--mu:#625C85;--ln:#D9D4EE;--ac:#E8A317;--on:#1F1B3D;--ink:#2A2466;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13112A;--sf:#1D1A3D;--tx:#EEEBFA;--mu:#A8A2CC;--ln:#38336B;--ac:#F2B632;--on:#1F1B3D;--ink:#EEEBFA}}
+:root[data-theme="dark"]{--bg:#13112A;--sf:#1D1A3D;--tx:#EEEBFA;--mu:#A8A2CC;--ln:#38336B;--ac:#F2B632;--on:#1F1B3D;--ink:#EEEBFA}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 "Source Serif 4",Georgia,serif}
+main{max-width:520px;margin:0 auto;padding:20px 18px 48px}
+h1,h2,h3,.b{font-family:"Bricolage Grotesque",system-ui,sans-serif;margin:0}
+h1{font-size:34px;line-height:1.1;margin-bottom:8px}
+h2{font-size:22px;margin:26px 0 10px}
+p{margin:0 0 12px}.mu{color:var(--mu);font-size:14px}
+label{display:block;font:500 14px "Bricolage Grotesque",system-ui,sans-serif;margin:14px 0 5px}
+input,select{width:100%;padding:12px;border:1px solid var(--ln);border-radius:10px;background:var(--sf);color:var(--tx);font:16px system-ui,sans-serif}
+.row{display:flex;gap:10px}.row>*{flex:1}
+button{font:700 16px "Bricolage Grotesque",system-ui,sans-serif;border:0;border-radius:12px;padding:14px 18px;cursor:pointer;background:var(--ac);color:var(--on);width:100%}
+button.g{background:transparent;color:var(--tx);border:1px solid var(--ln);width:auto;padding:8px 14px;font-size:14px}
+button.g[aria-pressed="true"]{background:var(--ac);color:var(--on);border-color:var(--ac)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+.card .t{flex:1}.card b{font-family:"Bricolage Grotesque",system-ui,sans-serif;display:block}
+.card button{width:auto;padding:10px 16px;font-size:15px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip{background:var(--sf);border:1px solid var(--ln);border-radius:99px;padding:6px 12px;font:500 14px "Bricolage Grotesque",system-ui,sans-serif}
+.chip i{font-style:normal;color:var(--mu)}
+svg.k{width:100%;max-width:320px;display:block;margin:8px auto}
+svg.k line,svg.k rect,svg.k polygon{stroke:var(--ink);stroke-width:1.5;fill:none}
+svg.k text{fill:var(--tx);font:700 13px system-ui,sans-serif;text-anchor:middle}
+svg.k .p{fill:var(--ac);font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:8px 4px;border-bottom:1px solid var(--ln);text-align:left}
+tr.now td{background:color-mix(in srgb,var(--ac) 25%,transparent);font-weight:600}
+.rep h3{margin:20px 0 6px;font-size:18px}
+.back{margin-bottom:14px}
+.sheet{position:fixed;inset:0;background:rgba(10,8,30,.6);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet>div{background:var(--sf);width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px))}
+.ok{color:var(--ac);font-weight:700}.err{color:#d6455d;font-size:14px;margin-top:8px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+const SG=[
+["Mesha (Aries)","Mars","bold, quick to act and self-driven","leadership, entrepreneurship, defence, sports and competitive fields","passionate and direct; you need a partner who matches your pace"],
+["Vrishabha (Taurus)","Venus","steady, sensual and loyal","finance, arts, food, luxury goods, property and banking","devoted and patient; security and affection matter most"],
+["Mithuna (Gemini)","Mercury","curious, witty and adaptable","writing, media, trade, teaching, technology and communication","playful and talkative; you need mental connection first"],
+["Karka (Cancer)","Moon","caring, intuitive and protective","healthcare, hospitality, real estate, education and public-facing care roles","deeply emotional and nurturing; trust builds slowly"],
+["Simha (Leo)","Sun","confident, generous and proud","government, management, entertainment, politics and creative direction","warm and loyal; you want respect and admiration"],
+["Kanya (Virgo)","Mercury","analytical, practical and service-minded","analysis, medicine, accounting, research, quality and operations","careful and giving; you show love through acts of service"],
+["Tula (Libra)","Venus","balanced, diplomatic and charming","law, design, diplomacy, fashion, counselling and partnerships","romantic and fair-minded; harmony is essential to you"],
+["Vrishchika (Scorpio)","Mars","intense, perceptive and resilient","research, investigation, surgery, occult studies, insurance and strategy","all-or-nothing and private; loyalty is non-negotiable"],
+["Dhanu (Sagittarius)","Jupiter","optimistic, principled and freedom-loving","teaching, law, publishing, travel, advisory and spiritual work","honest and adventurous; you need space and shared beliefs"],
+["Makara (Capricorn)","Saturn","disciplined, ambitious and patient","administration, engineering, construction, industry and long-term enterprise","reserved and committed; love deepens with time"],
+["Kumbha (Aquarius)","Saturn","independent, inventive and humanitarian","technology, science, social causes, networks and innovation","friendly and unconventional; friendship comes before romance"],
+["Meena (Pisces)","Jupiter","compassionate, imaginative and spiritual","arts, healing, music, charity, hospitality and spiritual guidance","gentle and idealistic; you give freely and need emotional safety"]];
+const BODY=["head, brain and blood pressure","throat, neck and thyroid","lungs, shoulders and nerves","chest, stomach and digestion","heart and spine","intestines and digestion","kidneys and lower back","reproductive system and excretion","hips, thighs and liver","knees, joints and bones","calves, ankles and circulation","feet, sleep and immunity"];
+const EL=["fire","earth","air","water"];
+const NK=["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
+const DL=["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"],DY=[7,20,6,10,7,18,16,19,17];
+const DT={Ketu:"detachment, spiritual turns and sudden changes",Venus:"relationships, comfort, creativity and financial growth",Sun:"authority, recognition and career visibility",Moon:"emotions, home, family and public life",Mars:"drive, courage, property and conflict to manage",Rahu:"ambition, foreign links and unconventional gains",Jupiter:"wisdom, expansion, children, teachers and good fortune",Saturn:"discipline, delayed rewards, hard work and responsibility",Mercury:"business, learning, communication and skills"};
+const CITY={"Delhi":[28.61,77.21,5.5],"Mumbai":[19.08,72.88,5.5],"Kolkata":[22.57,88.36,5.5],"Chennai":[13.08,80.27,5.5],"Bengaluru":[12.97,77.59,5.5],"Hyderabad":[17.39,78.49,5.5],"Ahmedabad":[23.02,72.57,5.5],"Pune":[18.52,73.86,5.5],"Kathmandu":[27.7,85.32,5.75],"Dubai":[25.2,55.27,4],"London":[51.5,-0.12,0],"New York":[40.71,-74,-5]};
+const REP=[
+{id:"gen",n:"General life profile",d:"Personality, strengths and life direction",p:99},
+{id:"car",n:"Career and finance",d:"Best fields, money habits and timing",p:199},
+{id:"mar",n:"Marriage and relationships",d:"Partner traits and love patterns",p:199},
+{id:"das",n:"Dasha timeline",d:"Your planetary periods, year by year",p:299},
+{id:"hel",n:"Health",d:"Strengths, weak points and care tips",p:149},
+{id:"yr",n:"Yearly forecast",d:"What this year favours and what to watch",p:149},
+{id:"nav",n:"Navamsa (D9) profile",d:"Inner strength, destiny and marriage depth",p:199}];
+const BUNDLE=899;
+const S={step:"form",c:null,paid:{},rep:null,name:""};
+const $=a=>document.getElementById("app");
+const rad=x=>x*Math.PI/180,mod=(x,m)=>((x%m)+m)%m;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function calc(y,mo,d,h,mi,tz,lat,lon){
+  const ms=Date.UTC(y,mo-1,d,h,mi)-tz*3600000,jd=ms/86400000+2440587.5,t=jd-2451545;
+  const D=rad(297.85+12.190749*t),Ms=rad(357.529+0.98560028*t),M=rad(134.963+13.064993*t);
+  let moon=218.316+13.176396*t+6.289*Math.sin(M)+1.274*Math.sin(2*D-M)+0.658*Math.sin(2*D)+0.214*Math.sin(2*M)-0.186*Math.sin(Ms);
+  const g=rad(357.528+0.9856003*t);
+  let sun=280.46+0.9856474*t+1.915*Math.sin(g)+0.02*Math.sin(2*g);
+  const ay=23.857+0.013969*(t/365.25);
+  const th=rad(mod(280.46061837+360.98564736629*t+lon,360)),e=rad(23.439);
+  const asc=mod(Math.atan2(Math.cos(th),-(Math.sin(th)*Math.cos(e)+Math.tan(rad(lat))*Math.sin(e)))*180/Math.PI,360);
+  const sid=x=>mod(x-ay,360),mS=sid(moon),sS=sid(sun),aS=sid(asc);
+  const nk=Math.floor(mS/(360/27)),pada=Math.floor((mS%(360/27))/(360/108))+1;
+  const frac=1-(mS%(360/27))/(360/27),n0=nk%9,birth=ms+tz*3600000;
+  const das=[];let st=ms;
+  for(let i=0;i<9;i++){const k=(n0+i)%9,yrs=i==0?DY[k]*frac:DY[k],en=st+yrs*365.25*864e5;das.push({l:DL[k],s:st,e:en});st=en}
+  const nv=x=>Math.floor(x/(10/3))%12;return{moon:Math.floor(mS/30),sun:Math.floor(sS/30),lag:Math.floor(aS/30),nv:{moon:nv(mS),sun:nv(sS),lag:nv(aS)},nk,pada,das,birth};
+}
+const dt=ms=>new Date(ms).toLocaleDateString("en-GB",{month:"short",year:"numeric"});
+const cur=c=>c.das.find(x=>x.s<=Date.now()&&Date.now()<x.e)||c.das[c.das.length-1];
+const sg=i=>SG[mod(i,12)];
+
+function chart(c0,d9){const c=d9?c0.nv:c0;
+  const P=[[150,78],[75,40],[38,78],[75,155],[38,232],[75,270],[150,232],[225,270],[262,232],[225,155],[262,78],[225,40]];
+  let o='<svg class="k" viewBox="0 0 300 300" role="img" aria-label="Kundli chart"><rect x="10" y="10" width="280" height="280"/><line x1="10" y1="10" x2="290" y2="290"/><line x1="290" y1="10" x2="10" y2="290"/><polygon points="150,10 290,150 150,290 10,150"/>';
+  for(let h=0;h<12;h++){
+    const sn=mod(c.lag+h,12)+1,tags=[];
+    if(h==0)tags.push("La");if(mod(c.moon-c.lag,12)==h)tags.push("Mo");if(mod(c.sun-c.lag,12)==h)tags.push("Su");
+    const [x,y]=P[h];
+    o+=`<text x="${x}" y="${y}">${sn}</text>`;
+    if(tags.length)o+=`<text class="p" x="${x}" y="${y+15}">${tags.join(" ")}</text>`;
+  }
+  return o+"</svg>";
+}
+
+function report(id,c){
+  const L=sg(c.lag),M=sg(c.moon),Su=sg(c.sun),cd=cur(c),el=EL[c.lag%4];
+  const dsum=`You are running the ${cd.l} Mahadasha (${dt(cd.s)} to ${dt(cd.e)}), a period of ${DT[cd.l]}.`;
+  if(id=="gen")return[
+   ["Your rising sign",`With ${L[0]} rising, your outer personality is ${L[2]}. ${L[1]} rules your chart, so its themes shape how you approach life.`],
+   ["Your Moon sign",`Your Moon in ${M[0]} makes your inner world ${M[2]}. This is the sign Vedic astrology uses to read your mind, moods and daily experience.`],
+   ["Your birth star",`You were born under ${NK[c.nk]}, pada ${c.pada}. Your Sun sits in ${Su[0]}, which adds ${Su[2].split(",")[0]} energy to how you pursue goals.`],
+   ["Where you are now",dsum]];
+  if(id=="car"){const t=sg(c.lag+9);return[
+   ["Your career house",`The 10th house of your chart falls in ${t[0]}, ruled by ${t[1]}. This points towards ${t[3]}.`],
+   ["Your working style",`Your rising sign makes you ${L[2]}, while your Moon in ${M[0]} asks for work that feels meaningful. Fields such as ${M[3]} suit your temperament.`],
+   ["Money habits",`${el[0].toUpperCase()+el.slice(1)} signs tend to ${el=="fire"?"earn fast and spend fast; set aside savings before spending":el=="earth"?"build wealth slowly and steadily; avoid over-caution":el=="air"?"earn through ideas and networks; track recurring costs":"follow intuition with money; write down a budget"}.`],
+   ["Timing",dsum]]}
+  if(id=="mar"){const t=sg(c.lag+6);return[
+   ["Your partnership house",`The 7th house falls in ${t[0]}, ruled by ${t[1]}. Partners often show ${t[2]} qualities.`],
+   ["How you love",`With your Moon in ${M[0]}, you are ${M[4]}.`],
+   ["What to look for",`Seek someone who respects your ${L[2].split(",")[0]} nature and shares your values. Full Guna Milan matching needs both partners’ charts.`],
+   ["Timing",dsum]]}
+  if(id=="nav"){const n=c.nv,NL=sg(n.lag),NM=sg(n.moon),NS=sg(n.sun),n7=sg(n.lag+6),v=[["Rising",n.lag==c.lag],["Moon",n.moon==c.moon],["Sun",n.sun==c.sun]].filter(x=>x[1]).map(x=>x[0]);return[
+   ["What the Navamsa shows","The Navamsa (D9) divides each sign into nine parts. Vedic astrology uses it to judge the true strength of your chart, your inner nature and the quality of marriage in the second half of life."],
+   ["Your Navamsa rising",`Your D9 rising sign is ${NL[0]}. At a deeper level you are ${NL[2]}.`],
+   ["Your Navamsa Moon and Sun",`Your Moon in ${NM[0]} shows an emotional core that is ${NM[2]}. Your Sun in ${NS[0]} shows a sense of purpose that is ${NS[2].split(",")[0]}.`],
+   ["Marriage depth",`The 7th house of your D9 falls in ${n7[0]}, ruled by ${n7[1]}. Your long-term partner often reflects ${n7[2]} qualities, and your marriage matures around this theme.`],
+   ["Reading it with your birth chart",`Your birth chart has ${L[0]} rising and Moon in ${M[0]}. ${v.length?v.join(" and ")+(v.length>1?" are":" is")+" vargottama (the same sign in both charts), which is a sign of strength.":"None of your main points are vargottama, so read both charts together."}`],
+   ["Where you are now",dsum]]}
+  if(id=="das"){return[["Your planetary periods",`<table><tr><th>Period</th><th>From</th><th>To</th></tr>${c.das.map(x=>`<tr class="${x===cd?"now":""}"><td>${x.l}</td><td>${dt(x.s)}</td><td>${dt(x.e)}</td></tr>`).join("")}</table>`],
+   ["The current period",dsum],
+   ["How to use it",`In a ${cd.l} period, put your effort into ${DT[cd.l].split(",")[0]}, and plan big decisions around the dates above.`]]}
+  if(id=="hel"){const s6=sg(c.lag+5);return[
+   ["Your constitution",`${L[0]} rising is a ${el} sign, linked to ${BODY[c.lag]}. Give these areas regular attention.`],
+   ["Stress pattern",`Your Moon in ${M[0]} means stress shows up as ${M[2].split(",")[0]} reactions. Regular sleep and routine help most.`],
+   ["Area to watch",`The 6th house falls in ${s6[0]}, so watch ${BODY[mod(c.lag+5,12)]}.`],
+   ["Note","This report is for general guidance only. It does not replace medical advice."]]}
+  const y=new Date().getFullYear();return[
+   [`${y}–${y+1} overview`,dsum],
+   ["Favoured areas",`Focus on ${DT[cd.l]}. Your Moon in ${M[0]} supports ${M[3].split(",")[0]} pursuits.`],
+   ["Handle with care","Avoid major commitments made in haste during Rahu Kaal or while stressed, and check dates against the Dasha table."],
+   ["Advice",`Lean on your ${L[2].split(",")[0]} strength and keep a simple weekly review of goals.`]];
+}
+
+function view(){
+  const a=$();
+  if(S.step=="form"){
+    a.innerHTML=`<h1>Graha</h1><p>Your Vedic birth chart and life reports, read from your exact birth details.</p>
+    <label for="nm">Name</label><input id="nm" autocomplete="name">
+    <label for="dob">Date of birth</label><input id="dob" type="date">
+    <label for="tob">Time of birth</label><input id="tob" type="time" value="12:00">
+    <label for="pl">Place of birth</label><select id="pl">${Object.keys(CITY).map(k=>`<option>${k}</option>`).join("")}<option>Other place</option></select>
+    <div id="oth" hidden><div class="row"><div><label for="la">Latitude</label><input id="la" type="number" step="0.01" placeholder="19.07"></div><div><label for="lo">Longitude</label><input id="lo" type="number" step="0.01" placeholder="72.87"></div><div><label for="tz">UTC offset</label><input id="tz" type="number" step="0.25" placeholder="5.5"></div></div></div>
+    <div id="er" class="err" role="alert"></div><div style="height:18px"></div>
+    <button id="go">Show my kundli</button><p class="mu" style="margin-top:14px">Uses the Lahiri ayanamsa. Birth time errors shift your rising sign, so use the exact time if you can.</p>`;
+    document.getElementById("pl").onchange=e=>document.getElementById("oth").hidden=e.target.value!="Other place";
+    document.getElementById("go").onclick=()=>{
+      const v=i=>document.getElementById(i).value,dob=v("dob"),tob=v("tob"),er=document.getElementById("er");
+      if(!dob||!tob){er.textContent="Enter your date and time of birth.";return}
+      let la,lo,tz;
+      if(v("pl")=="Other place"){la=+v("la");lo=+v("lo");tz=+v("tz");if(!v("la")||!v("lo")||v("tz")===""){er.textContent="Enter latitude, longitude and UTC offset.";return}}
+      else[la,lo,tz]=CITY[v("pl")];
+      const[y,m,d]=dob.split("-").map(Number),[h,mi]=tob.split(":").map(Number);
+      S.name=v("nm")||"Friend";S.c=calc(y,m,d,h,mi,tz,la,lo);S.step="home";view();scrollTo(0,0);
+    };
+  }else if(S.step=="home"){
+    const c=S.c,L=sg(c.lag),M=sg(c.moon),cd=cur(c),all=REP.every(r=>S.paid[r.id]);
+    a.innerHTML=`<button class="g back" id="bk">Change details</button>
+    <h1>${esc(S.name)}’s kundli</h1>
+    <div class="chips"><span class="chip"><i>Rising</i> ${L[0]}</span><span class="chip"><i>Moon</i> ${M[0]}</span><span class="chip"><i>Sun</i> ${sg(c.sun)[0]}</span><span class="chip"><i>Star</i> ${NK[c.nk]} ${c.pada}</span><span class="chip"><i>Dasha</i> ${cd.l}</span></div>
+    <div class="row" style="margin-top:8px"><button class="g" data-d="1" aria-pressed="${!S.d9}">Birth chart (D1)</button><button class="g" data-d="9" aria-pressed="${!!S.d9}">Navamsa (D9)</button></div>${chart(c,S.d9)}<p class="mu" style="text-align:center">${S.d9?"Navamsa chart.":"Birth chart."} Numbers are signs, La is rising, Mo is Moon, Su is Sun.</p>
+    <h2>Your reports</h2>
+    ${REP.map(r=>`<div class="card"><div class="t"><b>${r.n}</b><span class="mu">${r.d}</span></div>${S.paid[r.id]?`<button data-r="${r.id}">Read</button>`:`<button data-b="${r.id}">₹${r.p}</button>`}</div>`).join("")}
+    ${all?"":`<div class="card" style="border-color:var(--ac)"><div class="t"><b>All seven reports</b><span class="mu">Save ₹${REP.reduce((s,r)=>s+r.p,0)-BUNDLE}</span></div><button data-b="all">₹${BUNDLE}</button></div>`}
+    <p class="mu">For guidance and entertainment. Not a substitute for medical, legal or financial advice.</p>`;
+    document.getElementById("bk").onclick=()=>{S.step="form";view()};
+    a.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{S.d9=b.dataset.d=="9";view()});
+    a.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{S.rep=b.dataset.r;S.step="rep";view();scrollTo(0,0)});
+    a.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>pay(b.dataset.b));
+  }else{
+    const r=REP.find(x=>x.id==S.rep),sec=report(S.rep,S.c);
+    a.innerHTML=`<button class="g back" id="bk">Back to chart</button><h1>${r.n}</h1><p class="mu">Prepared for ${esc(S.name)}</p><div class="rep">${sec.map(s=>`<h3>${s[0]}</h3>${s[1].startsWith("<table")?s[1]:`<p>${s[1]}</p>`}`).join("")}</div>`;
+    document.getElementById("bk").onclick=()=>{S.step="home";view()};
+  }
+}
+function pay(id){
+  const r=REP.find(x=>x.id==id),price=id=="all"?BUNDLE:r.p,name=id=="all"?"All seven reports":r.n;
+  const s=document.createElement("div");s.className="sheet";
+  s.innerHTML=`<div role="dialog" aria-label="Payment"><h2 style="margin-top:0">${name}</h2><p>Total <b class="b">₹${price}</b></p><p class="mu">Demo checkout. No money is charged. In the live app this opens Razorpay (UPI, cards).</p><button id="py">Pay ₹${price}</button><div style="height:10px"></div><button class="g" id="cn" style="width:100%">Cancel</button></div>`;
+  document.body.appendChild(s);
+  document.getElementById("cn").onclick=()=>s.remove();
+  document.getElementById("py").onclick=()=>{(id=="all"?REP.map(x=>x.id):[id]).forEach(k=>S.paid[k]=1);s.remove();if(id!="all"){S.rep=id;S.step="rep"}view();scrollTo(0,0)};
+}
+view();
+</script>
+</body>
+</html>
